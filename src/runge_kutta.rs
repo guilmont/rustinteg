@@ -1,17 +1,16 @@
 use ndarray;
 
-pub type Array1d = ndarray::Array1<f64>;
-pub type Array2d = ndarray::Array2<f64>;
-
+pub type VecXd = ndarray::Array1<f64>;
+pub type MatXd = ndarray::Array2<f64>;
 
 pub trait Derivative {
-    fn evaluate(&self, x: f64, y: &Array1d) -> Array1d;
+    fn evaluate(&self, x: f64, y: &VecXd) -> VecXd;
 }
 
-pub fn integrate(arr_x: &Array1d, initial_values: &Array1d,  tolerance: f64, obj: &dyn Derivative) -> Array2d {
+pub fn integrate(arr_x: &VecXd, initial_values: &VecXd,  tolerance: f64, obj: &dyn Derivative) -> MatXd {
 
-    let ak: Array1d = ndarray::array![0.0, 2.0/9.0, 1.0/3.0, 3.0/4.0, 1.0, 5.0/6.0];
-    let bkl: Array2d = ndarray::array![
+    let ak: VecXd = ndarray::array![0.0, 2.0/9.0, 1.0/3.0, 3.0/4.0, 1.0, 5.0/6.0];
+    let bkl: MatXd = ndarray::array![
         [ 0.0,        0.0,          0.0,        0.0,       0.0       ],
         [ 2.0/9.0,    0.0,          0.0,        0.0,       0.0       ],
 	    [ 1.0/12.0,   1.0/4.0,      0.0,        0.0,       0.0       ],
@@ -19,23 +18,23 @@ pub fn integrate(arr_x: &Array1d, initial_values: &Array1d,  tolerance: f64, obj
 	    [ -17.0/12.0, 27.0/4.0,     -27.0/5.0,  16.0/15.0, 0.0       ],
 	    [ 65.0/432.0, -5.0/16.0,    13.0/16.0,  4.0/27.0,  5.0/144.0 ],
     ];
-    let chk: Array1d = ndarray::array![ 47.0/450.0, 0.0, 12.0/25.0, 32.0/225.0, 1.0/30.0, 6.0/25.0 ];
-    let ctk: Array1d = ndarray::array![ 1.0/150.0, 0.0, -3.0/100.0, 16.0/75.0, 1.0/20.0, -6.0/25.0 ];
+    let chk: VecXd = ndarray::array![ 47.0/450.0, 0.0, 12.0/25.0, 32.0/225.0, 1.0/30.0, 6.0/25.0 ];
+    let ctk: VecXd = ndarray::array![ 1.0/150.0, 0.0, -3.0/100.0, 16.0/75.0, 1.0/20.0, -6.0/25.0 ];
 
     let vec_size = initial_values.len();
-    let mut k0 = Array1d::zeros(vec_size);
-    let mut k1 = Array1d::zeros(vec_size);
-    let mut k2 = Array1d::zeros(vec_size);
-    let mut k3 = Array1d::zeros(vec_size);
-    let mut k4 = Array1d::zeros(vec_size);
-    let mut k5 = Array1d::zeros(vec_size);
-    let mut vec_error = Array1d::zeros(vec_size);
+    let mut k0 = VecXd::zeros(vec_size);
+    let mut k1 = VecXd::zeros(vec_size);
+    let mut k2 = VecXd::zeros(vec_size);
+    let mut k3 = VecXd::zeros(vec_size);
+    let mut k4 = VecXd::zeros(vec_size);
+    let mut k5 = VecXd::zeros(vec_size);
+    let mut vec_error = VecXd::zeros(vec_size);
 
     let mut h: f64;
     let mut trunc_error: f64;
     let mut y = initial_values.clone();
 
-    let mut output = Array2d::zeros((arr_x.len(), vec_size));
+    let mut output = MatXd::zeros((arr_x.len(), vec_size));
     output.row_mut(0).assign(&y);
 
     for kk in 1..arr_x.len() {
