@@ -1,7 +1,6 @@
 use ndarray::array;
 
-mod runge_kutta;
-use runge_kutta::VecXd;
+use rustinteg::runge_kutta::{self, VecXd};
 
 struct Logistic {
     growth_rate: f64,
