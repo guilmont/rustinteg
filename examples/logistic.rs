@@ -13,7 +13,7 @@ impl runge_kutta::Derivative for Logistic {
     }
 }
 
-fn main() {
+fn main(){
     let arr_x = VecXd::linspace(0.0, 25.0, 21);
     let initial_values: VecXd = array![0.01];
 
@@ -22,10 +22,10 @@ fn main() {
         capacity: 1.0,
     };
 
-    let solution = runge_kutta::integrate(&arr_x, &initial_values, 0.01, &obj);
-    let res = solution.column(0);
-
-    for kk in 0..arr_x.len() {
-        println!("{} {}", arr_x[kk], res[kk]);
+    if let Some(solution) = runge_kutta::integrate(&arr_x, &initial_values, 0.01, &obj) {
+        let res = solution.column(0);
+        for kk in 0..arr_x.len() {
+            println!("{} {}", arr_x[kk], res[kk]);
+        }
     }
 }

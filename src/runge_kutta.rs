@@ -7,7 +7,7 @@ pub trait Derivative {
     fn evaluate(&self, x: f64, y: &VecXd) -> VecXd;
 }
 
-pub fn integrate(arr_x: &VecXd, initial_values: &VecXd,  tolerance: f64, obj: &dyn Derivative) -> MatXd {
+pub fn integrate(arr_x: &VecXd, initial_values: &VecXd,  tolerance: f64, obj: &dyn Derivative) -> Option<MatXd> {
 
     let ak: VecXd = ndarray::array![0.0, 2.0/9.0, 1.0/3.0, 3.0/4.0, 1.0, 5.0/6.0];
     let bkl: MatXd = ndarray::array![
@@ -60,10 +60,15 @@ pub fn integrate(arr_x: &VecXd, initial_values: &VecXd,  tolerance: f64, obj: &d
             // Calculate new position based on results above.
             x += h;
             y.assign(&(&y + chk[0] * &k0 + chk[1] * &k1 + chk[2] * &k2 + chk[3] * &k3 + chk[4] * &k4 + chk[5] * &k5));
+
+            // If any of the values calculated are nan of infinite, we return nothing on the option
+            if y.is_any_nan() || y.is_any_infinite() {
+                return None;
+            }
         }
         // Save result into output array
         output.row_mut(kk).assign(&y);
     }
 
-    return output;
+    return Some(output);
 }
